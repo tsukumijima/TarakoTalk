@@ -1,0 +1,9 @@
+{
+    // Pylance の Type Checking を有効化
+    "python.analysis.typeCheckingMode": "basic",
+    // Pylance の Type Checking のうち、いくつかのエラー報告を抑制する
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportOptionalMemberAccess": "none",
+        "reportPrivateImportUsage": "none"
+    }
+}
