@@ -273,13 +273,18 @@ def main():
     parser_save.set_defaults(handler=SaveHandler)
     parser_play.set_defaults(handler=PlayHandler)
 
-    # 終了時にラインを表示する
-    atexit.register(lambda: console.rule(characters='─', align='center'))
+    # 終了時にラインを表示し、標準入出力を閉じる
+    def OnExit():
+        console.rule(characters='─', align='center')
+        sys.stdin.close()
+        sys.stdout.close()
+        sys.stderr.close()
+    atexit.register(OnExit)
 
     # 引数解析を実行
+    console.rule(title=f'TarakoTalk (Voiced by CoeFont) version {VERSION}', characters='─', align='center')
     args = parser.parse_args()
     if hasattr(args, 'handler'):
-        console.rule(title=f'TarakoTalk (Voiced by CoeFont) version {VERSION}', characters='─', align='center')
         args.handler(args)
     else:
         parser.print_help()
