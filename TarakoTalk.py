@@ -1,5 +1,6 @@
 
 import argparse
+import atexit
 import chardet
 import requests
 import simpleaudio
@@ -205,7 +206,6 @@ def main():
             # ファイルではなくフォルダが指定された場合を弾く
             if Path(output_file_path).is_dir():
                 console.print('[red]❌ 保存先のファイルパスが不正です。')
-                console.rule(characters='─', align='center')
                 sys.exit(1)
 
             # ファイルパス途中にあるフォルダをすべて作成 (すでにある場合は何もしない)
@@ -217,7 +217,6 @@ def main():
             except Exception:
                 console.print('[red]❌ 保存先のファイルを開けませんでした。')
                 console.print_exception(width=100)
-                console.rule(characters='─', align='center')
                 sys.exit(1)
 
         # Text-To-Speech を実行し、ファイルに保存
@@ -230,11 +229,9 @@ def main():
         if result is False:
             if is_stdout is False:
                 Path(output_file_path).unlink()
-            console.rule(characters='─', align='center')
             sys.exit(1)
 
         console.print(f'✅ 生成した音声を{"標準出力" if is_stdout else f" {Path(output_file_path).absolute()} "}に保存しました。')
-        console.rule(characters='─', align='center')
 
 
     # 再生時のハンドラー
@@ -255,9 +252,7 @@ def main():
         # 実行に失敗した場合はここで終了
         if result is False:
             Path(output_temp_file.name).unlink()  # 一時ファイルを削除
-            console.rule(characters='─', align='center')
             sys.exit(1)
-
 
         # 処理が終わるまでプログレスバーを表示
         with CreateProgressBar() as progress:
@@ -269,15 +264,17 @@ def main():
             # ref: https://laboratory.kazuuu.net/play-an-mp3-file-in-python-using-playsound/
             play_object = simpleaudio.WaveObject.from_wave_file(output_temp_file.name).play()
             play_object.wait_done()
+            console.print('✅ 生成した音声を再生しました。')
 
             Path(output_temp_file.name).unlink()  # 一時ファイルを削除
-        console.print('✅ 生成した音声を再生しました。')
-        console.rule(characters='─', align='center')
 
 
     # サブコマンドのイベントを登録
     parser_save.set_defaults(handler=SaveHandler)
     parser_play.set_defaults(handler=PlayHandler)
+
+    # 終了時にラインを表示する
+    atexit.register(lambda: console.rule(characters='─', align='center'))
 
     # 引数解析を実行
     args = parser.parse_args()
