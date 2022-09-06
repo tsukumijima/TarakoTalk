@@ -53,11 +53,10 @@ jobs:
           pip install pipenv
           PIPENV_VENV_IN_PROJECT="true" pipenv sync
 
-      # TarakoTalk のビルド (Intel Mac / Apple Silicon (M1))
+      # TarakoTalk のビルド
       - name: Build TarakoTalk macOS Binary
         run: |
           pipenv run build-macos
-          pipenv run build-macos-arm
 
       # Artifact としてアップロード
       - name: Upload TarakoTalk macOS Binary as Artifact
@@ -65,7 +64,6 @@ jobs:
         with:
           path: |
             ./tarakotalk-macos
-            ./tarakotalk-macos-arm
 
   # Linux 向けビルド
   build_linux:
@@ -83,7 +81,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo -E apt-get install libasound2-dev
+          DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y libasound2-dev patchelf
           pip install pipenv
           PIPENV_VENV_IN_PROJECT="true" pipenv sync
 
@@ -123,9 +121,9 @@ jobs:
           set -xeu
           cd /app
 
-          # Python 3.10 のインストール
+          # Python 3.10 と依存パッケージのインストール
           apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3.10-dev python3.10-full libasound2-dev
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3.10-dev python3.10-full libasound2-dev patchelf
 
           # 依存関係のインストール
           pip install pipenv
