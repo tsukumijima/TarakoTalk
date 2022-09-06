@@ -82,8 +82,8 @@ jobs:
       # 依存関係のインストール
       - name: Install Dependencies
         run: |
-          apt-get update
-          apt-get install libasound2-dev
+          sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo -E apt-get install libasound2-dev
           pip install pipenv
           PIPENV_VENV_IN_PROJECT="true" pipenv sync
 
@@ -125,7 +125,7 @@ jobs:
 
           # Python 3.10 のインストール
           apt-get update
-          apt-get install -y python3.10-dev python3.10-full libasound2-dev
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3.10-dev python3.10-full libasound2-dev
 
           # 依存関係のインストール
           pip install pipenv
