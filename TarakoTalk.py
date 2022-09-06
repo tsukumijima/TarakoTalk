@@ -269,9 +269,10 @@ def main():
             # ref: https://laboratory.kazuuu.net/play-an-mp3-file-in-python-using-playsound/
             play_object = simpleaudio.WaveObject.from_wave_file(output_temp_file.name).play()
             play_object.wait_done()
-            console.print('✅ 生成した音声を再生しました。')
 
             Path(output_temp_file.name).unlink()  # 一時ファイルを削除
+
+        console.print('✅ 生成した音声を再生しました。')
 
 
     # サブコマンドのイベントを登録
