@@ -11,8 +11,8 @@ build-windows = "nuitka --mingw64 --follow-imports --onefile TarakoTalk.py"
 rich = "*"
 nuitka = "*"
 requests = "*"
-playsound = "*"
 chardet = "*"
+simpleaudio = "*"
 
 [dev-packages]
 
