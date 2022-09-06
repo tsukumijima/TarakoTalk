@@ -25,9 +25,8 @@ def main():
     ## ref: https://sig9.org/archives/4478
     parser = argparse.ArgumentParser(
         formatter_class = argparse.RawTextHelpFormatter,
-        description = 'Hiroyuki CLI TTS Application',
+        description = 'Cross-platform CLI TTS Application for Hiroyuki\'s Voice',
     )
-    parser.add_argument('-v', '--version', action='version', help='バージョン情報を表示する', version=f'TarakoTalk version {VERSION}')
     subparsers = parser.add_subparsers()
     parser_save = subparsers.add_parser('save', help='生成した音声をファイルに保存する')
     parser_save.add_argument('input', help='ひろゆきに喋らせるテキスト (文字列 or ファイルパス、"-" で標準入力から読み込み)')
