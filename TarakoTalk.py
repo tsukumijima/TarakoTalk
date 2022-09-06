@@ -65,7 +65,10 @@ def main():
         if input_data == '-':
 
             # stdin のデータをすべて読み込む
-            input_text = sys.stdin.read()
+            # 文字エンコーディングを自動判定して読み込み
+            input_text_raw = sys.stdin.buffer.read()
+            input_text_encoding = chardet.detect(input_text_raw)['encoding']
+            input_text = input_text_raw.decode(input_text_encoding)
 
         # ファイルから読み込み (ファイルが存在する場合のみ)
         elif Path(input_data).is_file():
@@ -74,13 +77,14 @@ def main():
             with open(input_data, mode='rb') as f:
                 input_text_raw = f.read()
             input_text_encoding = chardet.detect(input_text_raw)['encoding']
-            input_data = input_text_raw.decode(input_text_encoding)
+            input_text = input_text_raw.decode(input_text_encoding)
 
         # それ以外の場合、input_data に与えられたテキストをそのままひろゆきに喋らせる
         else:
             input_text = input_data
 
-        return input_text
+        # 改行やホワイトスペースを消した上で返す
+        return input_text.strip()
 
 
     def TextToSpeech(input_text: str, output_file: IO[bytes]) -> bool:
@@ -104,6 +108,8 @@ def main():
             'referer': 'https://hiroyuki.coefont.cloud/',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
         }
+
+        console.print(f'📋 テキスト: {input_text}')
 
         # 処理が終わるまでプログレスバーを表示
         with CreateProgressBar() as progress:
