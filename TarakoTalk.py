@@ -25,7 +25,7 @@ def main():
     ## ref: https://sig9.org/archives/4478
     parser = argparse.ArgumentParser(
         formatter_class = argparse.RawTextHelpFormatter,
-        description = 'Cross-platform CLI TTS Application for Hiroyuki\'s Voice',
+        description = 'Cross-platform CLI TTS Tools for Hiroyuki\'s Voice',
     )
     subparsers = parser.add_subparsers()
     parser_save = subparsers.add_parser('save', help='生成した音声をファイルに保存する')
@@ -89,14 +89,14 @@ def main():
 
     def TextToSpeech(input_text: str, output_file: IO[bytes]) -> bool:
         """
-        Text-To-Speech を実行し、生成した音声をファイルに保存する
+        Text-to-Speech を実行し、生成した音声をファイルに保存する
 
         Args:
             input_text (str): ひろゆきに喋らせるテキスト
             output_file (IO[bytes]): 保存先のファイルの file-like オブジェクト
 
         Returns:
-            bool: Text-To-Speech の実行に成功したか
+            bool: Text-to-Speech の実行に成功したか
         """
 
         # API に渡すヘッダー
@@ -111,13 +111,19 @@ def main():
 
         console.print(f'📋 テキスト: {input_text}')
 
+        # テキストが 1000 文字以上
+        ## 1000 文字以上だと "Invalid text" のエラーが発生する
+        if len(input_text) >= 1000:
+            console.print('[red]❌ テキストは 1000 文字以内で入力してください。')
+            return False
+
         # 処理が終わるまでプログレスバーを表示
         with CreateProgressBar() as progress:
 
             # プログレスバー (終了未定) を表示
             progress.add_task('音声を生成しています…', total=None)
 
-            # Text-To-Speech を実行
+            # Text-to-Speech を実行
             result = requests.post(
                 url = 'https://tgeedx93af.execute-api.ap-northeast-1.amazonaws.com/production/hiroyuki/text2speech',
                 headers = headers,
@@ -177,7 +183,7 @@ def main():
             else:
                 console.print(
                     '[red]❌ 音声の生成に失敗しました。CoeFont のサーバーが混雑している可能性があります。\n'
-                    f'   (HTTP Error {result.json()["body"]["statusCode"]} / Message: {result.json()["body"]["error"]["message"]})'
+                    f'   (HTTP Error {result.json()["statusCode"]} / Message: {result.json()["body"]["error"]["message"]})'
                 )
 
             return False
@@ -218,7 +224,7 @@ def main():
                 console.print_exception(width=100)
                 sys.exit(1)
 
-        # Text-To-Speech を実行し、ファイルに保存
+        # Text-to-Speech を実行し、ファイルに保存
         result = TextToSpeech(input_text, output_file)
 
         # ファイルを閉じる (重要)
@@ -242,7 +248,7 @@ def main():
         # 一時保存先の一時ファイルを開く
         output_temp_file = tempfile.NamedTemporaryFile(mode='wb', delete=False)
 
-        # Text-To-Speech を実行し、一時ファイルに保存
+        # Text-to-Speech を実行し、一時ファイルに保存
         result = TextToSpeech(input_text, output_temp_file)
 
         # 一時ファイルを閉じる (まだ削除はされない)
