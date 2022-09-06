@@ -5,7 +5,7 @@ name = "pypi"
 
 [scripts]
 build-windows = "python -m nuitka --mingw64 --follow-imports --onefile --assume-yes-for-downloads -o TarakoTalk.exe TarakoTalk.py"
-build-macos = "python -m nuitka --mingw64 --follow-imports --onefile --assume-yes-for-downloads --macos-target-arch=universal -o tarakotalk-macos TarakoTalk.py"
+build-macos = "python -m nuitka --mingw64 --follow-imports --onefile --assume-yes-for-downloads --macos-target-arch=x86_64 -o tarakotalk-macos TarakoTalk.py"
 build-linux = "python -m nuitka --mingw64 --follow-imports --onefile --assume-yes-for-downloads -o tarakotalk-linux TarakoTalk.py"
 build-linux-arm = "python -m nuitka --mingw64 --follow-imports --onefile --assume-yes-for-downloads -o tarakotalk-linux-arm TarakoTalk.py"
 
