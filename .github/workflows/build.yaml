@@ -1,0 +1,139 @@
+
+name: Build TarakoTalk
+
+# 手動実行
+on: [workflow_dispatch]
+
+# ジョブの定義
+jobs:
+
+  # Windows 向けビルド
+  build_windows:
+    runs-on: windows-2022
+
+    steps:
+
+      # このリポジトリをチェックアウトし、Python 環境をセットアップ
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 依存関係のインストール
+      - name: Install Dependencies
+        run: |
+          pip install pipenv
+          $env:PIPENV_VENV_IN_PROJECT="true"; pipenv sync
+
+      # TarakoTalk のビルド
+      - name: Build TarakoTalk Windows Binary
+        run: pipenv run build-windows
+
+      # Artifact としてアップロード
+      - name: Upload TarakoTalk Windows Binary as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./TarakoTalk.exe
+
+  # Mac 向けビルド
+  build_mac:
+    runs-on: macos-11
+
+    steps:
+
+      # このリポジトリをチェックアウトし、Python 環境をセットアップ
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 依存関係のインストール
+      - name: Install Dependencies
+        run: |
+          pip install pipenv
+          PIPENV_VENV_IN_PROJECT="true" pipenv sync
+
+      # TarakoTalk のビルド (Intel Mac / Apple Silicon (M1))
+      - name: Build TarakoTalk macOS Binary
+        run: |
+          pipenv run build-macos
+          pipenv run build-macos-arm
+
+      # Artifact としてアップロード
+      - name: Upload TarakoTalk macOS Binary as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            ./tarakotalk-macos
+            ./tarakotalk-macos-arm
+
+  # Linux 向けビルド
+  build_linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      # このリポジトリをチェックアウトし、Python 環境をセットアップ
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 依存関係のインストール
+      - name: Install Dependencies
+        run: |
+          pip install pipenv
+          PIPENV_VENV_IN_PROJECT="true" pipenv sync
+
+      # TarakoTalk のビルド
+      - name: Build TarakoTalk Linux Binary
+        run: pipenv run build-linux
+
+      # Artifact としてアップロード
+      - name: Upload TarakoTalk Linux Binary as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./tarakotalk-linux
+
+  # Linux (ARM) 向けビルド
+  build_linux_arm:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      # このリポジトリをチェックアウト
+      - uses: actions/checkout@v3
+
+      # QEMU 環境をセットアップ
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+
+      # Python 3.10 のインストール / 依存関係のインストール / TarakoTalk のビルド
+      ## arm64 向けにクロスコンパイルを行う
+      ## クロスコンパイルを行う関係で、Linux (ARM) のみ Python 3.10 を apt からインストールする
+      ## ref: https://scrapbox.io/nwtgck/GitHub_Actions%E4%B8%8A%E3%81%A7ARM%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8BDocker%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E6%96%B9%E6%B3%95
+      - name: Build TarakoTalk Linux Binary
+        run: |
+
+          # クロスコンパイル用の Docker コンテナに入る
+          set -xeu
+          docker run --rm -i -v $PWD:/app arm64v8/ubuntu:22.04 bash << EOF
+          set -xeu
+          cd /app
+
+          # Python 3.10 のインストール
+          apt-get install -y python3.10-dev python3.10-full
+
+          # 依存関係のインストール
+          pip install pipenv
+          PIPENV_VENV_IN_PROJECT="true" pipenv sync
+
+          # TarakoTalk のビルド
+          pipenv run build-linux-arm
+          EOF
+
+      # Artifact としてアップロード
+      - name: Upload TarakoTalk Linux Binary as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./tarakotalk-linux-arm
